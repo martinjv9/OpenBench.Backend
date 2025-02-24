@@ -1,6 +1,7 @@
-import fs from 'fs';
+import fs from "fs";
+import path from "path";
 
 export const httpsOptions = {
-  key: fs.readFileSync('./certs/private-key.pem'),
-  cert: fs.readFileSync('./certs/certificate.pem')
+  key: fs.readFileSync(path.resolve("/etc/letsencrypt/live/openbenches.com/privkey.pem")),
+  cert: fs.readFileSync(path.resolve("/etc/letsencrypt/live/openbenches.com/fullchain.pem")),
 };
