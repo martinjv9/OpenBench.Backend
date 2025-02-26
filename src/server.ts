@@ -6,6 +6,7 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import { httpsOptions } from "./config/httpsConfig";
 import authRoutes from "./routes/authRoutes";
+import registerUserRoutes from "./routes/registerUserRoutes";
 import sensorRoutes from "./routes/sensorRoutes";
 import mqtt from "mqtt";
 
@@ -32,9 +33,9 @@ mqttClient.on("message", (topic, message) => {
   console.log(`📩 MQTT Message Received: ${message.toString()}`);
 });
 
-
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("api/registerUser", registerUserRoutes);
 
 app.get("/api/sensors", (req, res) => {
   res.json({ status: "Sensors online", timestamp: Date.now() });
@@ -77,4 +78,3 @@ app.get("/", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🌍 Express Server running on http://0.0.0.0:${PORT}`);
 });
-
