@@ -3,10 +3,12 @@ import https from "https";
 import http from "http";
 import cors from "cors";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import { httpsOptions } from "./config/httpsConfig";
 import authRoutes from "./routes/authRoutes";
-import registerUserRoutes from "./routes/registerUserRoutes";
+import registerRoutes from "./routes/registerRoutes";
+import loginRoutes from "./routes/loginRoutes";
 import sensorRoutes from "./routes/sensorRoutes";
 import mqtt from "mqtt";
 
@@ -17,7 +19,14 @@ const PORT = Number(process.env.PORT) || 3000;
 const mqttClient = mqtt.connect("mqtt:localhost:1883");
 
 // Middleware
-app.use(express.json());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Only allow 100 requests per IP per window
+  message: "Too many requests, please try again later"
+});
+
+app.use(limiter);
+app.use(express.json({ limit: "10kb" }));
 app.use(cors());
 app.use(helmet());
 
@@ -35,7 +44,9 @@ mqttClient.on("message", (topic, message) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("api/registerUser", registerUserRoutes);
+app.use("/api/registerUser", registerRoutes);
+app.use("/api/loginUser", loginRoutes);
+
 
 app.get("/api/sensors", (req, res) => {
   res.json({ status: "Sensors online", timestamp: Date.now() });
