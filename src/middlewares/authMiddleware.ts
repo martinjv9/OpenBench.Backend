@@ -1,6 +1,19 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload, VerifyErrors } from "jsonwebtoken";
 import { JWT_SECRET } from "../config/jwtConfig";
+
+// ✅ Define custom `DecodedUser` type
+interface DecodedUser extends JwtPayload {
+  userId: number;
+  email?: string;
+}
+
+// ✅ Extend Express Request Type to Support `req.user`
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: DecodedUser;
+  }
+}
 
 export const authenticateToken = (
   req: Request,
@@ -15,12 +28,28 @@ export const authenticateToken = (
     return;
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      res.status(403).json({ message: "Invalid or expired token" });
-      return;
+  jwt.verify(
+    token,
+    JWT_SECRET as string,
+    (
+      err: VerifyErrors | null,
+      decodedPayload: string | JwtPayload | undefined
+    ) => {
+      if (err) {
+        res.status(403).json({ message: "Invalid or expired token" });
+        return;
+      }
+      if (
+        !decodedPayload ||
+        typeof decodedPayload !== "object" ||
+        !("userId" in decodedPayload)
+      ) {
+        res.status(403).json({ message: "Invalid token payload" });
+        return;
+      }
+
+      req.user = decodedPayload as DecodedUser;
+      next();
     }
-    req.user = user; // Attach user info to request
-    next();
-  });
+  );
 };

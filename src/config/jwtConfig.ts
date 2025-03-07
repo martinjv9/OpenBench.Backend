@@ -2,12 +2,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Ensure required environment variables are defined
 const checkEnvVar = (key: string): string => {
-  if (!process.env[key]) {
+  const value = process.env[key]?.trim(); // ✅ Trim whitespace just in case
+  if (!value) {
     throw new Error(`❌ Missing environment variable: ${key}`);
   }
-  return process.env[key] as string;
+  return value;
 };
 
 // Securely load JWT secrets

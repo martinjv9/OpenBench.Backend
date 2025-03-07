@@ -22,21 +22,31 @@ export const refreshToken = (req: Request, res: Response): void => {
   jwt.verify(
     refreshToken,
     REFRESH_TOKEN_SECRET,
-    (err: jwt.VerifyErrors | null, user: DecodedUser | undefined) => {
+    (
+      err: jwt.VerifyErrors | null,
+      decodedPayload: string | JwtPayload | undefined
+    ) => {
       if (err) {
         res.status(403).json({ message: "Invalid refresh token" });
         return;
       }
 
-      if (!user || !user.userId) {
+      if (
+        !decodedPayload ||
+        typeof decodedPayload !== "object" ||
+        !("userId" in decodedPayload)
+      ) {
         res.status(403).json({ message: "Invalid token payload" });
         return;
       }
 
-      // ✅ Generate new access token
-      const accessToken = jwt.sign({ userId: user.userId }, JWT_SECRET, {
-        expiresIn: JWT_EXPIRES_IN,
-      });
+      const decodedUser = decodedPayload as DecodedUser;
+
+      const accessToken = jwt.sign(
+        { userId: decodedUser.userId },
+        JWT_SECRET as string,
+        { expiresIn: JWT_EXPIRES_IN || "15m" } as jwt.SignOptions
+      );
 
       res.status(200).json({ accessToken });
     }
