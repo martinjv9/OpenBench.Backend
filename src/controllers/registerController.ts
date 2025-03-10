@@ -24,6 +24,7 @@ export const registerUser = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("Registering user");
     const {
       username,
       fName,
