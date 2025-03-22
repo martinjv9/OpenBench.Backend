@@ -5,14 +5,13 @@ import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes";
 import sensorRoutes from "./routes/sensorRoutes";
-import mqtt from "mqtt";
+import './services/mqttService';
 import logger from "./services/loggingService";
 
 dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const mqttClient = mqtt.connect("mqtt:localhost:1883");
 
 // Middleware
 const limiter = rateLimit({
@@ -31,34 +30,6 @@ app.use((req, res, next) => {
     headers: req.headers,
   });
   next();
-});
-
-// MQTT
-// When connected
-mqttClient.on("connect", () => {
-  console.log("📡 MQTT Broker Connected!");
-  mqttClient.subscribe("sensor/data", (err) => {
-    if (err) {
-      console.error("❌ MQTT Subscription Error:", err.message);
-    }
-  });
-});
-
-// When message is received
-mqttClient.on("message", (topic, message) => {
-  console.log(`📩 MQTT Message Received: ${message.toString()}`);
-});
-
-mqttClient.on("error", (error) => {
-  console.error("🚨 MQTT Error:", error.message);
-});
-
-mqttClient.on("offline", () => {
-  console.warn("⚠️ MQTT Broker Offline!");
-});
-
-mqttClient.on("reconnect", () => {
-  console.log("🔄 Reconnecting to MQTT Broker...");
 });
 
 // Routes

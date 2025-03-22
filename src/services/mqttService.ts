@@ -1,7 +1,8 @@
 // src/services/mqttService.ts
 import mqtt from 'mqtt';
 import dotenv from 'dotenv';
-import logger from './services/loggingService';
+import logger from '../services/loggingService';
+
 dotenv.config();
 
 const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost';
