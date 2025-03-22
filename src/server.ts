@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes";
 import sensorRoutes from "./routes/sensorRoutes";
 import mqtt from "mqtt";
+import logger from "./services/loggingService";
 
 dotenv.config();
 
@@ -24,6 +25,13 @@ app.use(limiter);
 app.use(express.json({ limit: "10kb" }));
 app.use(cors());
 app.use(helmet());
+app.use((req, res, next) => {
+  logger.http(`Incoming ${req.method} request to ${req.path}`, {
+    ip: req.ip,
+    headers: req.headers,
+  });
+  next();
+});
 
 // MQTT
 // When connected

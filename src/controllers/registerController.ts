@@ -8,6 +8,7 @@ import {
   findUserByUsername,
 } from "../models/UserModel";
 import dotenv from "dotenv";
+import logger from "../services/loggingService";
 
 dotenv.config();
 
@@ -48,6 +49,11 @@ export const registerUser = async (
       !security_question_2 ||
       !answer_2
     ) {
+      logger.warn("Registration failed due to validation errors.", {
+        username,
+        email,
+        ip: req.ip,
+      });
       res.status(400).json({ message: "All fields required" });
       return;
     }
@@ -56,6 +62,11 @@ export const registerUser = async (
       !validator.isAlphanumeric(username) ||
       !validator.isLength(username, { min: 3, max: 50 })
     ) {
+      logger.warn("Registration failed due to username errors.", {
+        username,
+        email,
+        ip: req.ip,
+      });
       res.status(400).json({
         message: "Username must be alphanumeric and between 3-50 characters.",
       });
@@ -63,18 +74,33 @@ export const registerUser = async (
     }
 
     if (!validator.isEmail(email)) {
+      logger.warn("Registration failed due to email error.", {
+        username,
+        email,
+        ip: req.ip,
+      });
       res.status(400).json({ message: "Invalid email format." });
       return;
     }
 
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
+      logger.warn("Registration failed due to already used email.", {
+        username,
+        email,
+        ip: req.ip,
+      });
       res.status(409).json({ message: "Email already in use." });
       return;
     }
 
     const existingUsername = await findUserByUsername(username);
     if (existingUsername) {
+      logger.warn("Registration failed due to username in use.", {
+        username,
+        email,
+        ip: req.ip,
+      });
       res.status(409).json({ message: "Username already in use." });
       return;
     }
@@ -98,8 +124,19 @@ export const registerUser = async (
     };
 
     await createUser(newUser);
+    logger.info("User registered successfully.", { username, email });
     res.status(201).json({ message: "User registered successfully!" });
   } catch (error) {
+    if (error instanceof Error) {
+      logger.error("Registration error.", {
+        error: error.message,
+        stack: error.stack,
+      });
+    } else {
+      logger.error("Registration error.", {
+        error: String(error),
+      });
+    }
     console.error("❌ Registration Error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
