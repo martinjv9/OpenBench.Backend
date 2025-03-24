@@ -1,0 +1,43 @@
+2025-03-22 12:35:47 info: Connected to MQTT broker
+2025-03-22 12:35:47 info: Subscribed to topic
+2025-03-22 12:35:54 error: Registration error.
+2025-03-22 12:45:25 error: Registration error.
+2025-03-22 12:46:44 error: Registration error.
+2025-03-22 12:53:57 info: Connected to MQTT broker
+2025-03-22 12:53:57 info: Subscribed to topic
+2025-03-22 12:54:03 info: User registered successfully.
+2025-03-22 12:56:25 info: Connected to MQTT broker
+2025-03-22 12:56:25 info: Subscribed to topic
+2025-03-22 12:57:16 warn: Registration failed due to username in use.
+2025-03-22 12:57:28 info: User registered successfully.
+2025-03-22 12:58:33 info: Connected to MQTT broker
+2025-03-22 12:58:33 info: Subscribed to topic
+2025-03-22 13:07:36 info: Connected to MQTT broker
+2025-03-22 13:07:36 info: Subscribed to topic
+2025-03-22 13:10:50 info: Connected to MQTT broker
+2025-03-22 13:10:50 info: Subscribed to topic
+2025-03-22 13:10:57 info: Connected to MQTT broker
+2025-03-22 13:10:57 info: Subscribed to topic
+2025-03-22 13:11:08 info: Connected to MQTT broker
+2025-03-22 13:11:08 info: Subscribed to topic
+2025-03-22 13:11:12 info: Connected to MQTT broker
+2025-03-22 13:11:12 info: Subscribed to topic
+2025-03-22 13:11:21 info: Connected to MQTT broker
+2025-03-22 13:11:21 info: Subscribed to topic
+2025-03-22 13:11:54 info: Connected to MQTT broker
+2025-03-22 13:11:54 info: Subscribed to topic
+2025-03-22 13:12:12 info: Connected to MQTT broker
+2025-03-22 13:12:12 info: Subscribed to topic
+2025-03-22 13:12:34 info: Login successful.
+2025-03-22 13:17:22 info: Connected to MQTT broker
+2025-03-22 13:17:22 info: Subscribed to topic
+2025-03-22 13:17:29 info: Connected to MQTT broker
+2025-03-22 13:17:29 info: Subscribed to topic
+2025-03-22 13:17:42 info: Connected to MQTT broker
+2025-03-22 13:17:42 info: Subscribed to topic
+2025-03-22 13:17:54 info: Connected to MQTT broker
+2025-03-22 13:17:54 info: Subscribed to topic
+2025-03-22 13:18:04 info: Login successful.
+2025-03-22 13:18:18 info: Connected to MQTT broker
+2025-03-22 13:18:18 info: Subscribed to topic
+2025-03-22 13:18:21 info: Login successful.
