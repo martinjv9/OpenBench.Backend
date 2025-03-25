@@ -16,22 +16,34 @@ exports.loginUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const UserModel_1 = require("../models/UserModel");
 const jwtUtils_1 = require("../utils/jwtUtils");
+const dotenv_1 = __importDefault(require("dotenv"));
+const loggingService_1 = __importDefault(require("../services/loggingService"));
+dotenv_1.default.config();
+const PEPPER_SECRET = process.env.PEPPER_SECRET || "";
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, pwd } = req.body;
         if (!email || !pwd) {
+            loggingService_1.default.warn("Login failed due to missing credentials.", { email, ip: req.ip });
             res.status(400).json({ message: "Email and password are required." });
             return;
         }
         const user = yield (0, UserModel_1.findUserByEmail)(email);
         if (!user) {
-            console.warn(`❌ Login failed: User not found for email: ${email}`);
+            loggingService_1.default.warn("Login attempt failed. Email not found.", {
+                attemptedEmail: email,
+                ip: req.ip,
+            });
             res.status(401).json({ message: "Invalid email or password." });
             return;
         }
-        const isPasswordValid = yield bcryptjs_1.default.compare(pwd, user.password);
+        const isPasswordValid = yield bcryptjs_1.default.compare(pwd + PEPPER_SECRET, user.password);
         if (!isPasswordValid) {
-            console.warn(`❌ Login failed: Invalid password for email: ${email}`);
+            loggingService_1.default.warn("Login attempt failed. Incorrect password.", {
+                email: user.email,
+                userId: user.id,
+                ip: req.ip,
+            });
             res.status(401).json({ message: "Invalid email or password." });
             return;
         }
@@ -49,13 +61,24 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
+        loggingService_1.default.info("Login successful.", {
+            email: user.email,
+            username: user.username,
+            userId: user.id,
+            ip: req.ip,
+        });
         res.status(200).json({
             message: "Login successful!",
             accessToken,
         });
     }
     catch (error) {
-        console.error("❌ Login Error:", error);
+        if (error instanceof Error) {
+            loggingService_1.default.error("Login error.", { error: error.message, stack: error.stack });
+        }
+        else {
+            loggingService_1.default.error("Login error.", { error: String(error) });
+        }
         res.status(500).json({ message: "Internal server error" });
     }
 });

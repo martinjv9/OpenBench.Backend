@@ -11,6 +11,7 @@ import logger from "./services/loggingService";
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware

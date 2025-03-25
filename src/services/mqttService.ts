@@ -8,7 +8,9 @@ dotenv.config();
 const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost';
 const MQTT_TOPIC = 'sensors/data';
 
-const client = mqtt.connect(MQTT_BROKER);
+const client = mqtt.connect(MQTT_BROKER, {
+  rejectUnauthorized: false,
+});
 
 client.on('connect', () => {
   logger.info('Connected to MQTT broker', { broker: MQTT_BROKER });
@@ -41,7 +43,7 @@ client.on('message', (topic, message) => {
 });
 
 client.on('error', (err) => {
-  logger.error('MQTT connection error', { error: err.message });
+  logger.error('MQTT connection error', { error: err.message, stack: err.stack });
 });
 
 export default client;
