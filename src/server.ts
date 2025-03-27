@@ -34,6 +34,10 @@ app.use((req, res, next) => {
 });
 
 // Routes
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.url}`);
+  next();
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/sensors", sensorRoutes);
 
