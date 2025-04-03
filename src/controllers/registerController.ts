@@ -15,11 +15,23 @@ dotenv.config();
 const PEPPER_SECRET = process.env.PEPPER_SECRET || "";
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12", 10);
 
-// Validate Input
-// check email/username uniqueness
-// hash, salt, pepper password
-// store to DB
+/*
+*   Creates a new user and adds it to the database
+*   
+*   @param json files {
+      "username": "abc123",
+      "fName": "First",
+      "lName": "Last",
+      "email": "newuser123@example.com",
+      "pwd": "Password01",
+      "security_question_1": "What is your mother's maiden name?",
+      "answer_1": "Smith",
+      "security_question_2": "What was the name of your first pet?",
+      "answer_2": "Fido"
+    }
 
+*   @ res.status(201).json({ message: "User registered successfully!" })
+*/
 export const registerUser = async (
   req: Request,
   res: Response

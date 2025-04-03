@@ -25,4 +25,18 @@ export const storeData = async (data: SensorData): Promise<void> => {
     );
 };
 
+export const getAllLatestSensorStatus = async (): Promise<SensorData[]> => {
+    const [rows] = await pool.query(`
+      SELECT sd.*
+      FROM sensor_data sd
+      INNER JOIN (
+        SELECT sensorId, MAX(timestamp) AS latest_time
+        FROM sensor_data
+        GROUP BY sensorId
+      ) latest ON sd.sensorId = latest.sensorId AND sd.timestamp = latest.latest_time
+      ORDER BY sd.sensorId;
+    `);
+
+    return rows as SensorData[];
+};
 
