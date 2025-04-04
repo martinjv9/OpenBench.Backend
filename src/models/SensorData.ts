@@ -1,4 +1,5 @@
 import pool from "../config/db";
+import logger from "../services/loggingService";
 
 export interface SensorData {
     id?: number;
@@ -10,33 +11,43 @@ export interface SensorData {
 }
 
 export const storeData = async (data: SensorData): Promise<void> => {
-    const { equipmentId, sensorId, timestamp, activity, battery } = data;
+    try {
+        const { equipmentId, sensorId, timestamp, activity, battery } = data;
 
-    const query = "INSERT INTO sensor_data (sensorId, equipmentId, timestamp, activity, battery) VALUES (?, ?, ?, ?, ?)";
+        // ✅ Input validation
+        if (
+            typeof sensorId !== 'number' ||
+            typeof equipmentId !== 'string' ||
+            typeof timestamp !== 'string' ||
+            typeof activity !== 'boolean'
+        ) {
+            logger.error("Invalid sensor data format", { data });
+            throw new Error("Invalid sensor data format");
+        }
 
-    await pool.query(query,
-        [
-            data.sensorId,
-            data.equipmentId,
-            data.timestamp,
-            data.activity,
-            data.battery
-        ]
-    );
+        const query = `
+      INSERT INTO sensor_data 
+      (sensorId, equipmentId, timestamp, activity, battery) 
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+        await pool.query(query, [
+            sensorId,
+            equipmentId,
+            timestamp,
+            activity,
+            battery ?? null,
+        ]);
+
+        logger.info("Sensor data successfully stored", { sensorId, equipmentId, timestamp });
+
+    } catch (error) {
+        logger.error("❌ Failed to store sensor data", {
+            input: data,
+            error: error instanceof Error ? error.message : String(error),
+        });
+
+        // Rethrow for controller to handle
+        throw new Error("Database insert failed: " + (error instanceof Error ? error.message : String(error)));
+    }
 };
-
-export const getAllLatestSensorStatus = async (): Promise<SensorData[]> => {
-    const [rows] = await pool.query(`
-      SELECT sd.*
-      FROM sensor_data sd
-      INNER JOIN (
-        SELECT sensorId, MAX(timestamp) AS latest_time
-        FROM sensor_data
-        GROUP BY sensorId
-      ) latest ON sd.sensorId = latest.sensorId AND sd.timestamp = latest.latest_time
-      ORDER BY sd.sensorId;
-    `);
-
-    return rows as SensorData[];
-};
-

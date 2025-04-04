@@ -3,6 +3,6 @@ import registerUser from "../controllers/registerController";
 
 const router = express.Router();
 
-router.post("/registerUser");
+router.post("/registerUser", registerUser);
 
 export default router;
