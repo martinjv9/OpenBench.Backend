@@ -42,6 +42,7 @@ app.use((req, res, next) => {
 });
 app.use("/api/auth", authRoutes);
 app.use("/api/sensors", sensorRoutes);
+app.use("/api/equipment", equipmentRoutes)
 app.use("/api/dashboard", dashboardRoutes);
 
 // Test Route

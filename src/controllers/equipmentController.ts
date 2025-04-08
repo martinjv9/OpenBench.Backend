@@ -17,3 +17,19 @@ export const getEquipmentSummary = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+
+export const getEquipmentActive = async (req: Request, res: Response) => {
+    try {
+        const active: any = await pool.query("SELECT COUNT(*) AS count FROM equipmenttest WHERE in_use ='1'");
+
+        res.json({
+            active: active[0]?.count || 0
+        })
+    } catch (err) {
+        console.error("Error fetching equipment summary:", err);
+        res.status(500).json({ error: "Internal server error, TACTO1" });
+
+    }
+
+}

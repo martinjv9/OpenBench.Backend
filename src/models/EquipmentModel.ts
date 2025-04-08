@@ -1,7 +1,7 @@
 import pool from "../config/db";
 import logger from "../services/loggingService";
 
-export interface SensorData {
+export interface EquipmentData {
     id?: number;
     sensorId: number;
     equipmentId: string;
@@ -10,7 +10,10 @@ export interface SensorData {
     battery?: number;
 }
 
-export const storeData = async (data: SensorData): Promise<void> => {
+
+// TODO:
+// Edit this file to work with Equipment
+export const storeData = async (data: EquipmentData): Promise<void> => {
     try {
         const { equipmentId, sensorId, timestamp, activity, battery } = data;
 
@@ -26,7 +29,7 @@ export const storeData = async (data: SensorData): Promise<void> => {
         }
 
         const query = `
-      INSERT INTO sensor_data 
+      INSERT INTO equpment 
       (sensorId, equipmentId, timestamp, activity, battery) 
       VALUES (?, ?, ?, ?, ?)
     `;
@@ -50,3 +53,9 @@ export const storeData = async (data: SensorData): Promise<void> => {
         throw new Error("Database insert failed: " + (error instanceof Error ? error.message : String(error)));
     }
 };
+
+
+// access matrix
+// roles rows
+// columns permmisions
+// 
