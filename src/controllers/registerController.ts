@@ -9,6 +9,10 @@ import {
 } from "../models/UserModel";
 import dotenv from "dotenv";
 import logger from "../services/loggingService";
+import { generateVerificationToken } from "../utils/generateToken";
+import { createOneTimeCode } from "../models/OneTimeCodeModel";
+import { sendEmailVerification, sendOTCEmail } from "../services/emailService";
+import { createVerificationToken } from "../models/VerificationTokenModel";
 
 dotenv.config();
 
@@ -135,7 +139,19 @@ export const registerUser = async (
       answer_2: hashedAnswer2,
     };
 
-    await createUser(newUser);
+    const userId = await createUser(newUser);
+
+    const verificationToken = generateVerificationToken();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    await createVerificationToken({
+      userId,
+      token: verificationToken,
+      expiresAt,
+    });
+
+    await sendEmailVerification(email, verificationToken);
+
     logger.info("User registered successfully.", { username, email });
     res.status(201).json({ message: "User registered successfully!" });
   } catch (error) {
@@ -150,6 +166,37 @@ export const registerUser = async (
       });
     }
     console.error("❌ Registration Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const sendOTC = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId, email } = req.body;
+
+    if (!userId || !email) {
+      res.status(400).json({ message: "User ID and email are required" });
+      return;
+    }
+
+    const code = await createOneTimeCode(userId);
+
+    await sendOTCEmail(email, code);
+
+    logger.info("One-time code sent to email.", { email });
+    res.status(200).json({ message: "One-time code sent to email." });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error("OTC sending error.", {
+        error: error.message,
+        stack: error.stack,
+      });
+    } else {
+      logger.error("OTC sending error.", {
+        error: String(error),
+      });
+    }
+    console.error("❌ OTC Sending Error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

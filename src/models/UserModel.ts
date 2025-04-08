@@ -12,14 +12,15 @@ export interface User {
   answer_1: string;
   security_question_2: string;
   answer_2: string;
+  //verified: boolean;
 }
 
 // Create a new user in MySQL
-export const createUser = async (user: User): Promise<void> => {
+export const createUser = async (user: User): Promise<number> => {
   const query =
     "INSERT INTO users (username, first_name, last_name, email, password, security_question_1, answer_1, security_question_2, answer_2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-  await pool.query(query, [
+  const params = [
     user.username,
     user.first_name,
     user.last_name,
@@ -29,7 +30,13 @@ export const createUser = async (user: User): Promise<void> => {
     user.answer_1,
     user.security_question_2,
     user.answer_2,
-  ]);
+  ];
+
+  const [result] = (await pool.execute(query, params)) as any;
+  if (result.affectedRows === 0) {
+    throw new Error("Failed to create user");
+  }
+  return result.insertId as number;
 };
 
 // Find user by email
