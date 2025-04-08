@@ -6,11 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // src/services/mqttService.ts
 const mqtt_1 = __importDefault(require("mqtt"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const loggingService_1 = __importDefault(require("./services/loggingService"));
+const loggingService_1 = __importDefault(require("../services/loggingService"));
 dotenv_1.default.config();
 const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost';
 const MQTT_TOPIC = 'sensors/data';
-const client = mqtt_1.default.connect(MQTT_BROKER);
+const client = mqtt_1.default.connect(MQTT_BROKER, {
+    rejectUnauthorized: false,
+});
 client.on('connect', () => {
     loggingService_1.default.info('Connected to MQTT broker', { broker: MQTT_BROKER });
     client.subscribe(MQTT_TOPIC, (err) => {
@@ -39,6 +41,6 @@ client.on('message', (topic, message) => {
     }
 });
 client.on('error', (err) => {
-    loggingService_1.default.error('MQTT connection error', { error: err.message });
+    loggingService_1.default.error('MQTT connection error', { error: err.message, stack: err.stack });
 });
 exports.default = client;

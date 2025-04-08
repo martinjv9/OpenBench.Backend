@@ -1,14 +1,17 @@
-// src/services/mqttService.ts
 import mqtt from 'mqtt';
 import dotenv from 'dotenv';
 import logger from '../services/loggingService';
+import { receivedSensorData } from '../controllers/sensorController';
+import { Request, Response } from 'express';
 
 dotenv.config();
 
 const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost';
 const MQTT_TOPIC = 'sensors/data';
 
-const client = mqtt.connect(MQTT_BROKER);
+const client = mqtt.connect(MQTT_BROKER, {
+  rejectUnauthorized: false,
+});
 
 client.on('connect', () => {
   logger.info('Connected to MQTT broker', { broker: MQTT_BROKER });
@@ -22,26 +25,38 @@ client.on('connect', () => {
   });
 });
 
-client.on('message', (topic, message) => {
+client.on('message', async (topic, message) => {
   logger.info('Received MQTT message', { topic, message: message.toString() });
 
   try {
-    const sensorData = JSON.parse(message.toString());
-    logger.debug('Parsed sensor data', { sensorData });
+    const parsedData = JSON.parse(message.toString());
 
-    // TODO: Save to DB, notify frontend, etc.
+    // ✅ Construct a fake Request and Response object
+    const mockReq = {
+      body: parsedData,
+    } as Request;
+
+    const mockRes = {
+      status: (code: number) => {
+        return {
+          json: (data: any) => {
+            logger.info(`Sensor data processed: ${code}`, data);
+          },
+        };
+      },
+    } as unknown as Response;
+
+    await receivedSensorData(mockReq, mockRes);
 
   } catch (error) {
-    if (error instanceof Error) {
-      logger.error('Error parsing sensor data', { error: error.message });
-    } else {
-      logger.error('Unknown error parsing sensor data', { error });
-    }
+    logger.error('Failed to handle MQTT message', {
+      error: error instanceof Error ? error.message : error,
+    });
   }
 });
 
 client.on('error', (err) => {
-  logger.error('MQTT connection error', { error: err.message });
+  logger.error('MQTT connection error', { error: err.message, stack: err.stack });
 });
 
 export default client;
