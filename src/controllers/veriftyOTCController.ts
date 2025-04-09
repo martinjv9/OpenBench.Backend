@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { findOneTimeCode, deleteOneTimeCode } from "../models/OneTimeCodeModel";
+import {
+  deleteOneTimeCode,
+  findOneTimeCodebyUserId,
+} from "../models/OneTimeCodeModel";
 import logger from "../services/loggingService";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwtUtils";
+import { findUserById } from "../models/UserModel";
 
 export const verifyOTC = async (req: Request, res: Response): Promise<void> => {
   const { userId, code } = req.body;
@@ -12,7 +17,13 @@ export const verifyOTC = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const oneTimeCode = await findOneTimeCode(userId);
+    const oneTimeCode = await findOneTimeCodebyUserId(userId);
+    const user = await findUserById(userId);
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
 
     if (!oneTimeCode) {
       res.status(404).json({ message: "One-time code not found" });
@@ -34,8 +45,30 @@ export const verifyOTC = async (req: Request, res: Response): Promise<void> => {
 
     await deleteOneTimeCode(userId);
 
+    const accessToken = generateAccessToken(userId, user.email);
+
+    // ✅ Generate Refresh Token
+    const refreshToken = generateRefreshToken(userId);
+
+    // ✅ Store Refresh Token in HTTP-only Cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Secure only in production
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    logger.info("Login successful.", {
+      email: user.email,
+      username: user.username,
+      userId: user.id,
+      ip: req.ip,
+    });
+
     logger.info("✅ One-time code verified successfully", { userId });
-    res.status(200).json({ message: "One-time code verified successfully" });
+    res
+      .status(200)
+      .json({ message: "One-time code verified successfully", accessToken });
   } catch (error) {
     logger.error("❌ Error in verifyOTC:", {
       userId,

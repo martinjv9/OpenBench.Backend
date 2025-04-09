@@ -78,3 +78,20 @@ export const findUserByUsername = async (
     throw new Error("Database query failed");
   }
 };
+
+export const findUserById = async (id: number): Promise<User | null> => {
+  try {
+    const query = "SELECT * FROM users WHERE id = ?";
+    const params = [id];
+    const [rows]: any = await pool.query(query, params);
+
+    if (!rows || rows.length === 0) {
+      return null;
+    }
+
+    return rows[0] as User;
+  } catch (error) {
+    console.error("❌ Database Error in findUserById:", error);
+    throw new Error("Database query failed");
+  }
+};

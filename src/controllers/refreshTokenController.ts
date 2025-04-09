@@ -5,6 +5,8 @@ import {
   JWT_SECRET,
   JWT_EXPIRES_IN,
 } from "../config/jwtConfig";
+import { generateAccessToken } from "../utils/jwtUtils";
+import logger from "../services/loggingService";
 
 // Define JWT payload type
 interface DecodedUser extends JwtPayload {
@@ -51,4 +53,29 @@ export const refreshToken = (req: Request, res: Response): void => {
       res.status(200).json({ accessToken });
     }
   );
+};
+
+export const refreshAccessToken = (req: Request, res: Response): void => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    res.status(401).json({ message: "Refresh token required" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET as string
+    ) as { userId: number };
+
+    const accessToken = generateAccessToken(decoded.userId, "");
+
+    logger.info("✅ Access token refreshed.", { userId: decoded.userId });
+
+    res.status(200).json({ accessToken });
+  } catch (error) {
+    logger.error("❌ Invalid refresh token", { error });
+    res.status(403).json({ message: "Invalid refresh token" });
+  }
 };

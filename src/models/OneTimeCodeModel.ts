@@ -49,7 +49,7 @@ export const createOneTimeCode = async (
   }
 };
 
-export const findOneTimeCode = async (
+export const findOneTimeCodebyUserId = async (
   userId: number
 ): Promise<OneTimeCode | null> => {
   try {
