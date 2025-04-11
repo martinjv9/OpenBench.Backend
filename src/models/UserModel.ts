@@ -12,6 +12,7 @@ export interface User {
   answer_1: string;
   security_question_2: string;
   answer_2: string;
+  role: string;
   //verified: boolean;
 }
 

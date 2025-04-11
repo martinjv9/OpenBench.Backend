@@ -45,10 +45,10 @@ export const verifyOTC = async (req: Request, res: Response): Promise<void> => {
 
     await deleteOneTimeCode(userId);
 
-    const accessToken = generateAccessToken(userId, user.email);
+    const accessToken = generateAccessToken(userId, user.email, user.role);
 
     // ✅ Generate Refresh Token
-    const refreshToken = generateRefreshToken(userId);
+    const refreshToken = generateRefreshToken(userId, user.email, user.role);
 
     // ✅ Store Refresh Token in HTTP-only Cookie
     res.cookie("refreshToken", refreshToken, {

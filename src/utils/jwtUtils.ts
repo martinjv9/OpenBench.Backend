@@ -16,17 +16,25 @@ if (!REFRESH_TOKEN_SECRET) {
   throw new Error("REFRESH_TOKEN_SECRET is missing in the .env file");
 }
 
-export const generateAccessToken = (userId: number, email: string): string => {
+export const generateAccessToken = (
+  userId: number,
+  email: string,
+  role: string
+): string => {
   return jwt.sign(
-    { userId, email },
+    { userId, email, role },
     JWT_SECRET as Secret,
     { expiresIn: jwtExpiresIn } as SignOptions
   );
 };
 
-export const generateRefreshToken = (userId: number): string => {
+export const generateRefreshToken = (
+  userId: number,
+  userEmail: string,
+  userRole: string
+): string => {
   return jwt.sign(
-    { userId },
+    { is: userId, email: userEmail, role: userRole },
     REFRESH_TOKEN_SECRET as Secret,
     { expiresIn: refreshTokenExpiresIn } as SignOptions
   );

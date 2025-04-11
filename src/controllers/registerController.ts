@@ -137,6 +137,7 @@ export const registerUser = async (
       answer_1: hashedAnswer1,
       security_question_2,
       answer_2: hashedAnswer2,
+      role: "user",
     };
 
     const userId = await createUser(newUser);

@@ -7,6 +7,7 @@ import {
 } from "../config/jwtConfig";
 import { generateAccessToken } from "../utils/jwtUtils";
 import logger from "../services/loggingService";
+import { findUserById } from "../models/UserModel";
 
 // Define JWT payload type
 interface DecodedUser extends JwtPayload {
@@ -67,9 +68,19 @@ export const refreshAccessToken = (req: Request, res: Response): void => {
     const decoded = jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET as string
-    ) as { userId: number };
+    ) as { userId: number; email: string; role: string };
 
-    const accessToken = generateAccessToken(decoded.userId, "");
+    const userInfo = findUserById(decoded.userId);
+    if (!userInfo) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const accessToken = generateAccessToken(
+      decoded.userId,
+      decoded.email,
+      decoded.role
+    );
 
     logger.info("✅ Access token refreshed.", { userId: decoded.userId });
 

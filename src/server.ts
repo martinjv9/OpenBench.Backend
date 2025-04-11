@@ -5,7 +5,7 @@ import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes";
 import sensorRoutes from "./routes/sensorRoutes";
-import './services/mqttService';
+import "./services/mqttService";
 import logger from "./services/loggingService";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import equipmentRoutes from "./routes/equipmentRoutes";
@@ -13,7 +13,7 @@ import equipmentRoutes from "./routes/equipmentRoutes";
 dotenv.config();
 
 const app = express();
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 const PORT = Number(process.env.PORT) || 3000;
 
 // Limit api calls
@@ -35,14 +35,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.url}`);
   next();
 });
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/sensors", sensorRoutes);
-app.use("/api/equipment", equipmentRoutes)
+app.use("/api/equipment", equipmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 // Test Route
