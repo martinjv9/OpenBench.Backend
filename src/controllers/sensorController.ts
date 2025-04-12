@@ -5,6 +5,8 @@ import {
   endUsageSession,
 } from "../models/SensorData";
 
+// TODO: Add function to retrieve equipment full time usage from equipment_usage table
+
 export const postSensorData = async (req: Request, res: Response) => {
   const { sensorId, equipmentId, timestamp, activity } = req.body;
 

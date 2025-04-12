@@ -23,6 +23,11 @@ export const storeData = async (data: SensorData): Promise<void> => {
       throw new Error("Invalid sensor data format");
     }
 
+    if (!(await checkEquipmentExists(equipmentId))) {
+      logger.error(`Equipment ID ${equipmentId} does not exist.`);
+      throw new Error(`Equipment ID ${equipmentId} does not exist.`);
+    }
+
     const query = `
       INSERT INTO sensor_data 
       (sensor_id, equipment_id, datetime, in_use) 
@@ -49,6 +54,13 @@ export const storeData = async (data: SensorData): Promise<void> => {
 };
 
 export const startUsageSession = async (equipmentId: string): Promise<void> => {
+  if (!(await checkEquipmentExists(equipmentId))) {
+    logger.error(
+      `Cannot start session: Equipment ID ${equipmentId} does not exist.`
+    );
+    throw new Error(`Equipment ID ${equipmentId} does not exist.`);
+  }
+
   const [activeSession]: any = await pool.query(
     `SELECT * FROM equipment_usage WHERE equipmentId = ? AND endTime IS NULL`,
     [equipmentId]
@@ -101,4 +113,12 @@ export const endUsageSession = async (equipmentId: string): Promise<void> => {
       `Attempted to end session, but no active session found for equipment ${equipmentId}`
     );
   }
+};
+
+const checkEquipmentExists = async (equipmentId: string): Promise<boolean> => {
+  const [equipmentCheck]: any = await pool.query(
+    `SELECT * FROM equipment WHERE equipmentId = ?`,
+    [equipmentId]
+  );
+  return equipmentCheck.length > 0;
 };
