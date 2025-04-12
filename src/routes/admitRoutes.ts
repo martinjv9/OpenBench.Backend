@@ -1,15 +1,14 @@
 import express from "express";
-import { getDashboardSummary } from "../controllers/dashboardController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorizeRoles } from "../middlewares/roleMiddleware";
 
 const router = express.Router();
 
 router.get(
-  "/summary",
+  "/getUsers",
   authenticateToken,
-  authorizeRoles("technician", "admin"),
-  getDashboardSummary
+  authorizeRoles("admin"),
+  (req, res) => {
+    res.json({ message: "User list retrieved successfully" });
+  }
 );
-
-export default router;
