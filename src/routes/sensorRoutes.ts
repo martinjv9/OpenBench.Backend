@@ -1,12 +1,12 @@
 import express from "express";
-import { receivedSensorData } from "../controllers/sensorController";
+import { postSensorData } from "../controllers/sensorController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorizeRoles } from "../middlewares/roleMiddleware";
 import pool from "../config/db";
 
 const router = express.Router();
 
-router.post("/data", receivedSensorData);
+router.post("/data", postSensorData);
 
 router.get(
   "/status",

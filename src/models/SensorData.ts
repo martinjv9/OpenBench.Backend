@@ -7,42 +7,38 @@ export interface SensorData {
   equipmentId: string;
   timestamp: string;
   activity: boolean;
-  battery?: number;
 }
 
 export const storeData = async (data: SensorData): Promise<void> => {
   try {
-    const { equipmentId, sensorId, timestamp, activity, battery } = data;
+    const { equipmentId, sensorId, activity } = data;
 
     // ✅ Input validation
     if (
       typeof sensorId !== "number" ||
       typeof equipmentId !== "string" ||
-      typeof timestamp !== "string" ||
       typeof activity !== "boolean"
     ) {
       logger.error("Invalid sensor data format", { data });
       throw new Error("Invalid sensor data format");
     }
 
+    if (!(await checkEquipmentExists(equipmentId))) {
+      logger.error(`Equipment ID ${equipmentId} does not exist.`);
+      throw new Error(`Equipment ID ${equipmentId} does not exist.`);
+    }
+
     const query = `
       INSERT INTO sensor_data 
-      (sensorId, equipmentId, timestamp, activity, battery) 
-      VALUES (?, ?, ?, ?, ?)
+      (sensor_id, equipment_id, datetime, in_use) 
+      VALUES (?, ?, NOW(), ?)
     `;
 
-    await pool.query(query, [
-      sensorId,
-      equipmentId,
-      timestamp,
-      activity,
-      battery ?? null,
-    ]);
+    await pool.query(query, [sensorId, equipmentId, activity]);
 
     logger.info("Sensor data successfully stored", {
       sensorId,
       equipmentId,
-      timestamp,
     });
   } catch (error) {
     logger.error("❌ Failed to store sensor data", {
@@ -55,4 +51,74 @@ export const storeData = async (data: SensorData): Promise<void> => {
         (error instanceof Error ? error.message : String(error))
     );
   }
+};
+
+export const startUsageSession = async (equipmentId: string): Promise<void> => {
+  if (!(await checkEquipmentExists(equipmentId))) {
+    logger.error(
+      `Cannot start session: Equipment ID ${equipmentId} does not exist.`
+    );
+    throw new Error(`Equipment ID ${equipmentId} does not exist.`);
+  }
+
+  const [activeSession]: any = await pool.query(
+    `SELECT * FROM equipment_usage WHERE equipmentId = ? AND endTime IS NULL`,
+    [equipmentId]
+  );
+
+  if (activeSession.length === 0) {
+    await pool.query(
+      `INSERT INTO equipment_usage (equipmentId, startTime) VALUES (?, NOW())`,
+      [equipmentId]
+    );
+
+    await pool.query(
+      `UPDATE equipment SET status = 'in_use' WHERE equipmentId = ?`,
+      [equipmentId]
+    );
+
+    logger.info(`Started usage session for equipment ${equipmentId}`);
+  } else {
+    logger.warn(
+      `Attempted to start session, but session already active for equipment ${equipmentId}`
+    );
+  }
+};
+
+export const endUsageSession = async (equipmentId: string): Promise<void> => {
+  const [openSession]: any = await pool.query(
+    `SELECT usageId, startTime FROM equipment_usage WHERE equipmentId = ? AND endTime IS NULL`,
+    [equipmentId]
+  );
+
+  if (openSession.length > 0) {
+    const { usageId, startTime } = openSession[0];
+    const durationSec = Math.floor(
+      (new Date().getTime() - new Date(startTime).getTime()) / 1000
+    );
+
+    await pool.query(
+      `UPDATE equipment_usage SET endTime = NOW(), durationSec = ? WHERE usageId = ?`,
+      [durationSec, usageId]
+    );
+
+    await pool.query(
+      `UPDATE equipment SET status = 'available', usageCount = usageCount + 1, lastUsedAt = NOW() WHERE equipmentId = ?`,
+      [equipmentId]
+    );
+
+    logger.info(`Ended usage session for equipment ${equipmentId}`);
+  } else {
+    logger.warn(
+      `Attempted to end session, but no active session found for equipment ${equipmentId}`
+    );
+  }
+};
+
+const checkEquipmentExists = async (equipmentId: string): Promise<boolean> => {
+  const [equipmentCheck]: any = await pool.query(
+    `SELECT * FROM equipment WHERE equipmentId = ?`,
+    [equipmentId]
+  );
+  return equipmentCheck.length > 0;
 };
