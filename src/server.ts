@@ -9,6 +9,7 @@ import "./services/mqttService";
 import logger from "./services/loggingService";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import equipmentRoutes from "./routes/equipmentRoutes";
+import adminRoutes from "./routes/admitRoutes";
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/sensors", sensorRoutes);
 app.use("/api/equipment", equipmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
