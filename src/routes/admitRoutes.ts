@@ -1,19 +1,16 @@
 import express from "express";
-import {
-  getEquipmentSummary,
-  getEquipmentActive,
-} from "../controllers/equipmentController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorizeRoles } from "../middlewares/roleMiddleware";
 
 const router = express.Router();
 
 router.get(
-  "/summary",
+  "/getUsers",
   authenticateToken,
-  authorizeRoles("user", "technician", "admin"),
-  getEquipmentSummary
+  authorizeRoles("admin"),
+  (req, res) => {
+    res.json({ message: "User list retrieved successfully" });
+  }
 );
-router.get("/active", getEquipmentActive);
 
 export default router;
