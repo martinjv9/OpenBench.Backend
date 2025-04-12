@@ -1,16 +1,19 @@
 import express from "express";
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorizeRoles } from "../middlewares/roleMiddleware";
+import {
+  getAllUsers,
+  updateUserRole,
+  disableUserAccount,
+} from "../controllers/adminController";
 
 const router = express.Router();
 
-router.get(
-  "/getUsers",
-  authenticateToken,
-  authorizeRoles("admin"),
-  (req, res) => {
-    res.json({ message: "User list retrieved successfully" });
-  }
-);
+// Protect all routes: Admin only
+router.use(authenticateToken, authorizeRoles("admin"));
+
+router.get("/users", getAllUsers);
+router.put("/users/:id/role", updateUserRole);
+router.put("/users/:id/disable", disableUserAccount);
 
 export default router;
