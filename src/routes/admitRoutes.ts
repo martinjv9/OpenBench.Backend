@@ -12,3 +12,5 @@ router.get(
     res.json({ message: "User list retrieved successfully" });
   }
 );
+
+export default router;
