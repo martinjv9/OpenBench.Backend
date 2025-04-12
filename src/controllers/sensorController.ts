@@ -6,11 +6,11 @@ import {
 } from "../models/SensorData";
 
 export const postSensorData = async (req: Request, res: Response) => {
-  const { sensorId, equipmentId, timestamp, activity, battery } = req.body;
+  const { sensorId, equipmentId, timestamp, activity } = req.body;
 
   try {
     // Store the sensor data
-    await storeData({ sensorId, equipmentId, timestamp, activity, battery });
+    await storeData({ sensorId, equipmentId, timestamp, activity });
 
     // Automate session management
     if (activity === true) {
