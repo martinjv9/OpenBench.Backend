@@ -21,8 +21,8 @@ export const sendEmailVerification = async (
   to: string,
   token: string
 ): Promise<void> => {
-  const verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
-  const html = compileTemplate("emailVerification", { verificationUrl });
+  const verificationLink = `${process.env.APP_URL}/verify-email?token=${token}`;
+  const html = compileTemplate("verificationEmail", { verificationLink });
 
   try {
     await transporter.sendMail({
@@ -45,7 +45,7 @@ export const sendEmailVerification = async (
 
 export const sendOTCEmail = async (to: string, code: string): Promise<void> => {
   try {
-    const html = compileTemplate("oneTimeCode", { code });
+    const html = compileTemplate("otcEmail", { code });
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,

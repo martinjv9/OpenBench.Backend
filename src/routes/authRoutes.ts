@@ -8,14 +8,16 @@ import {
 import { verifyEmail } from "../controllers/verifyEmailController";
 import { resendOTC } from "../controllers/resendOTCController";
 import { logoutUser } from "../controllers/logoutController";
+import { verifyOTC } from "../controllers/veriftyOTCController";
 
 const router = express.Router();
 
 router.post("/register", registerUser);
 router.get("/verify-email", verifyEmail);
 router.post("/login", loginUser);
-router.post("/refresh", refreshToken); // ✅ Refresh token route
-router.post("/resend-otc", resendOTC);
+router.post("/verify-otc", verifyOTC);
+router.post("/refresh", refreshToken);
+router.post("/resend-otc", resendOTC); // Still need to test
 router.post("/refresh-access-token", refreshAccessToken);
 router.post("/logout", logoutUser);
 

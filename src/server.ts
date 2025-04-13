@@ -10,6 +10,7 @@ import logger from "./services/loggingService";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import equipmentRoutes from "./routes/equipmentRoutes";
 import adminRoutes from "./routes/admitRoutes";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
   });
   next();
 });
+app.use(cookieParser());
 
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.url}`);

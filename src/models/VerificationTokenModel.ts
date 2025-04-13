@@ -2,7 +2,7 @@ import pool from "../config/db";
 import logger from "../services/loggingService";
 
 export interface VerificationToken {
-  userId: number;
+  user_id: number;
   token: string;
   expiresAt: Date;
 }
@@ -12,11 +12,11 @@ export const createVerificationToken = async (
 ): Promise<void> => {
   try {
     const sql = `
-      INSERT INTO email_verification_tokens (userId, token, expiresAt)
+      INSERT INTO email_verification_tokens (user_id, token, expires_at)
         VALUES (?, ?, ?)
     `;
 
-    const params = [data.userId, data.token, data.expiresAt];
+    const params = [data.user_id, data.token, data.expiresAt];
     await pool.execute(sql, params);
   } catch (error) {
     logger.error("❌ Failed to store sensor data", {
@@ -43,6 +43,9 @@ export const findVerificationToken = async (
     const [rows]: any = await pool.execute(sql, [token]);
 
     if (!rows || rows.length === 0) {
+      logger.error("❌ Failed findVerificationToken:", {
+        error: "Token not found",
+      });
       return null;
     }
 
