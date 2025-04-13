@@ -35,7 +35,6 @@ export const verifyOTC = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ message: "One-time code has expired" });
       return;
     }
-
     const codeValid = await bcrypt.compare(code, oneTimeCode.codeHash);
 
     if (!codeValid) {

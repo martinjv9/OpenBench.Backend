@@ -146,7 +146,7 @@ export const registerUser = async (
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     await createVerificationToken({
-      userId,
+      user_id: userId,
       token: verificationToken,
       expiresAt,
     });

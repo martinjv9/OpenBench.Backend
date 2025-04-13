@@ -28,7 +28,7 @@ export const createOneTimeCode = async (
     const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
 
     const sql = `
-    INSERT INTO one_time_codes (userId, codeHash, expiresAt)
+    INSERT INTO one_time_codes (user_id, code_hash, expires_at)
     VALUES (?, ?, ?)
     `;
 
@@ -64,7 +64,13 @@ export const findOneTimeCodebyUserId = async (
       return null;
     }
 
-    return rows[0] as OneTimeCode;
+    const row = rows[0];
+
+    return {
+      userId: row.user_id,
+      codeHash: row.code_hash,
+      expiresAt: row.expires_at,
+    };
   } catch (error) {
     logger.error("❌ Database Error in findOneTimeCode:", {
       userId,
@@ -82,7 +88,7 @@ export const deleteOneTimeCode = async (userId: number): Promise<void> => {
   try {
     const sql = `
       DELETE FROM one_time_codes 
-      WHERE userId = ?
+      WHERE user_id = ?
     `;
     await pool.execute(sql, [userId]);
   } catch (error) {

@@ -9,6 +9,8 @@ import "./services/mqttService";
 import logger from "./services/loggingService";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import equipmentRoutes from "./routes/equipmentRoutes";
+import adminRoutes from "./routes/admitRoutes";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -34,6 +36,7 @@ app.use((req, res, next) => {
   });
   next();
 });
+app.use(cookieParser());
 
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.url}`);
@@ -45,6 +48,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/sensors", sensorRoutes);
 app.use("/api/equipment", equipmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
