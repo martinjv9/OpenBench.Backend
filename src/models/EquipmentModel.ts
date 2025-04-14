@@ -40,6 +40,28 @@ export const getEquipmentByStatus = async (status: string) => {
   return rows;
 };
 
+// Get equipment usage summary
+export const getEquipmentUsageSummary = async () => {
+  const [rows]: any = await pool.query(`
+      SELECT status, COUNT(*) as count
+      FROM equipment
+      GROUP BY status
+    `);
+
+  // Transform to key-value pairs
+  const summary: Record<string, number> = {
+    available: 0,
+    in_use: 0,
+    faulty: 0,
+  };
+
+  rows.forEach((row: any) => {
+    summary[row.status] = row.count;
+  });
+
+  return summary;
+};
+
 // Update equipment details
 export const updateEquipment = async (
   id: number,

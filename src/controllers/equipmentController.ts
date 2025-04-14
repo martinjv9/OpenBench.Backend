@@ -3,6 +3,7 @@ import logger from "../services/loggingService";
 import * as EquipmentModel from "../models/EquipmentModel";
 import { handleError } from "../services/errorHandler";
 
+// Create new equipment
 export const createEquipment = async (req: Request, res: Response) => {
   const { name, location, type } = req.body;
 
@@ -27,6 +28,7 @@ export const createEquipment = async (req: Request, res: Response) => {
   }
 };
 
+// Get all equipment
 export const getEquipment = async (req: Request, res: Response) => {
   try {
     const equipment = await EquipmentModel.getEquipment();
@@ -37,6 +39,7 @@ export const getEquipment = async (req: Request, res: Response) => {
   }
 };
 
+// Get equipment by status
 export const getEquipmentByStatusController = async (
   req: Request,
   res: Response
@@ -62,6 +65,21 @@ export const getEquipmentByStatusController = async (
   }
 };
 
+// Get equipment usage summary
+export const getEquipmentUsageSummaryController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const summary = await EquipmentModel.getEquipmentUsageSummary();
+    res.status(200).json(summary);
+  } catch (error) {
+    handleError(res, error, "Error fetching equipment usage summary");
+    return;
+  }
+};
+
+// Update equipment
 export const updateEquipment = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, location, type, status } = req.body;
@@ -87,6 +105,7 @@ export const updateEquipment = async (req: Request, res: Response) => {
   }
 };
 
+// Delete equipment
 export const deleteEquipment = async (req: Request, res: Response) => {
   const { id } = req.params;
 

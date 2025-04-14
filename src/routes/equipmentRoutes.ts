@@ -5,6 +5,7 @@ import {
   updateEquipment,
   deleteEquipment,
   getEquipmentByStatusController,
+  getEquipmentUsageSummaryController,
 } from "../controllers/equipmentController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorizeRoles } from "../middlewares/roleMiddleware";
@@ -36,6 +37,14 @@ router.get(
   authenticateToken,
   authorizeRoles("admin", "technician"),
   getEquipmentByStatusController
+);
+
+// Get equipment usage summary (Admin and Technician only)
+router.get(
+  "/usage-summary",
+  authenticateToken,
+  authorizeRoles("admin", "technician"),
+  getEquipmentUsageSummaryController
 );
 
 // Delete equipment (Admin and Technician only)
