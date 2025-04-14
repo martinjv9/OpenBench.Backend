@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import logger from "../services/loggingService";
 import * as EquipmentModel from "../models/EquipmentModel";
 import { handleError } from "../services/errorHandler";
+import { logActivity } from "../services/activityLogsService";
 
 // Create new equipment
 export const createEquipment = async (req: Request, res: Response) => {
@@ -17,6 +18,12 @@ export const createEquipment = async (req: Request, res: Response) => {
       name,
       location,
       type
+    );
+    await logActivity(
+      req.user?.id || null,
+      "Create Equipment",
+      `Equipment "${name}" created with type "${type}" at location "${location}"`,
+      req.ip as string
     );
     logger.info(`Equipment created: ${name}`);
     res
@@ -97,6 +104,13 @@ export const updateEquipment = async (req: Request, res: Response) => {
       return;
     }
 
+    await logActivity(
+      req.user?.id || null,
+      "Update Equipment",
+      `Equipment ID ${id} updated`,
+      req.ip as string
+    );
+
     logger.info(`Equipment updated: ID ${id}`);
     res.status(200).json({ message: "Equipment updated successfully" });
   } catch (error) {
@@ -116,6 +130,13 @@ export const deleteEquipment = async (req: Request, res: Response) => {
       res.status(404).json({ message: "Equipment not found" });
       return;
     }
+
+    await logActivity(
+      req.user?.id || null,
+      "Delete Equipment",
+      `Equipment ID ${id} deleted`,
+      req.ip as string
+    );
 
     logger.info(`Equipment deleted: ID ${id}`);
     res.status(200).json({ message: "Equipment deleted successfully" });
