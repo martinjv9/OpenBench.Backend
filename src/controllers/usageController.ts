@@ -38,9 +38,10 @@ export const endUsage = async (req: Request, res: Response) => {
     );
 
     if (rows.length === 0) {
-      return res
+      res
         .status(404)
         .json({ message: "No active usage session found for this equipment." });
+      return;
     }
 
     const { usageId, startTime } = rows[0];

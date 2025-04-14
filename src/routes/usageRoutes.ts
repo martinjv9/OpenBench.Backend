@@ -15,8 +15,8 @@ router.post(
 router.post(
   "/end",
   authenticateToken,
-  authorizeRoles("technician", "admin")
-  //endUsage
+  authorizeRoles("technician", "admin"),
+  endUsage
 );
 
 export default router;
