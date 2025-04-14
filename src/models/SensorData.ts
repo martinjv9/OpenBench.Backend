@@ -1,5 +1,6 @@
 import pool from "../config/db";
 import logger from "../services/loggingService";
+import { formatTimestampForMySQL } from "../utils/dateUtils";
 
 export interface SensorData {
   id?: number;
@@ -11,12 +12,13 @@ export interface SensorData {
 
 export const storeData = async (data: SensorData): Promise<void> => {
   try {
-    const { equipmentId, sensorId, activity } = data;
+    const { equipmentId, sensorId, activity, timestamp } = data;
+    const formattedTimestamp = formatTimestampForMySQL(timestamp);
 
     // ✅ Input validation
     if (
       typeof sensorId !== "number" ||
-      typeof equipmentId !== "string" ||
+      typeof equipmentId !== "number" ||
       typeof activity !== "boolean"
     ) {
       logger.error("Invalid sensor data format", { data });
@@ -31,10 +33,15 @@ export const storeData = async (data: SensorData): Promise<void> => {
     const query = `
       INSERT INTO sensor_data 
       (sensor_id, equipment_id, datetime, in_use) 
-      VALUES (?, ?, NOW(), ?)
+      VALUES (?, ?, ?, ?)
     `;
 
-    await pool.query(query, [sensorId, equipmentId, activity]);
+    await pool.query(query, [
+      sensorId,
+      equipmentId,
+      formattedTimestamp,
+      activity,
+    ]);
 
     logger.info("Sensor data successfully stored", {
       sensorId,

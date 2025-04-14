@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import pool from "../config/db";
+import { logActivity } from "../services/activityLogsService";
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -19,6 +20,12 @@ export const updateUserRole = async (req: Request, res: Response) => {
 
   try {
     await pool.query("UPDATE users SET role = ? WHERE id = ?", [role, id]);
+    await logActivity(
+      req.user?.id || null,
+      "Promote User",
+      `Promoted user ID ${id} to role 'technician'`,
+      req.ip as string
+    );
     res.status(200).json({ message: "User role updated successfully" });
   } catch (error) {
     console.error("Error updating user role:", error);
