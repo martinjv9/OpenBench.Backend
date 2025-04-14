@@ -1,61 +1,89 @@
 import pool from "../config/db";
 import logger from "../services/loggingService";
 
-export interface EquipmentData {
-    id?: number;
-    sensorId: number;
-    equipmentId: string;
-    timestamp: string;
-    activity: boolean;
-    battery?: number;
-}
-
-
-// TODO:
-// Edit this file to work with Equipment
-export const storeData = async (data: EquipmentData): Promise<void> => {
-    try {
-        const { equipmentId, sensorId, timestamp, activity, battery } = data;
-
-        // ✅ Input validation
-        if (
-            typeof sensorId !== 'number' ||
-            typeof equipmentId !== 'string' ||
-            typeof timestamp !== 'string' ||
-            typeof activity !== 'boolean'
-        ) {
-            logger.error("Invalid sensor data format", { data });
-            throw new Error("Invalid sensor data format");
-        }
-
-        const query = `
-      INSERT INTO equpment 
-      (sensorId, equipmentId, timestamp, activity, battery) 
-      VALUES (?, ?, ?, ?, ?)
-    `;
-
-        await pool.query(query, [
-            sensorId,
-            equipmentId,
-            timestamp,
-            activity,
-            battery ?? null,
-        ]);
-
-        logger.info("Sensor data successfully stored", { sensorId, equipmentId, timestamp });
-
-    } catch (error) {
-        logger.error("❌ Failed to store sensor data", {
-            input: data,
-            error: error instanceof Error ? error.message : String(error),
-        });
-
-        throw new Error("Database insert failed: " + (error instanceof Error ? error.message : String(error)));
-    }
+// Create new equipment
+export const createEquipment = async (
+  name: string,
+  location: string,
+  type: string
+) => {
+  try {
+    const [result]: any = await pool.query(
+      "INSERT INTO equipment (name, location, type) VALUES (?, ? , ?)",
+      [name, location, type]
+    );
+    return result.insertId;
+  } catch (error) {
+    logger.error("Error creating equipment:", error);
+    return null;
+  }
 };
 
+// Get all equipment
+export const getEquipment = async () => {
+  try {
+    const [rows]: any = await pool.query("SELECT * FROM equipment");
 
-// access matrix
-// roles rows
-// columns permmisions
-// 
+    return rows;
+  } catch (error) {
+    logger.error("Error fetching equipment:", error);
+    return [];
+  }
+};
+
+// Get equipment by status
+export const getEquipmentByStatus = async (status: string) => {
+  const [rows]: any = await pool.query(
+    `SELECT * FROM equipment WHERE status = ?`,
+    [status]
+  );
+  return rows;
+};
+
+// Update equipment details
+export const updateEquipment = async (
+  id: number,
+  fields: { name?: string; location?: string; type?: string; status?: string }
+) => {
+  const updates: string[] = [];
+  const values: any[] = [];
+
+  if (fields.name) {
+    updates.push("name = ?");
+    values.push(fields.name);
+  }
+  if (fields.location) {
+    updates.push("location = ?");
+    values.push(fields.location);
+  }
+  if (fields.type) {
+    updates.push("type = ?");
+    values.push(fields.type);
+  }
+  if (fields.status !== undefined) {
+    updates.push("status = ?");
+    values.push(fields.status);
+  }
+
+  if (updates.length === 0) {
+    throw new Error("No fields to update");
+  }
+
+  values.push(id);
+
+  const query = `UPDATE equipment SET ${updates.join(
+    ", "
+  )} WHERE equipmentId = ?`;
+
+  const [result]: any = await pool.query(query, values);
+  return result;
+};
+
+// Delete equipment using ID
+export const deleteEquipment = async (id: number) => {
+  const [result]: any = await pool.query(
+    `DELETE FROM equipment WHERE equipmentId = ?`,
+    [id]
+  );
+  return result;
+};
