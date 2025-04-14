@@ -1,7 +1,7 @@
 import pool from "../config/db";
 import logger from "../services/loggingService";
-import { Request, Response } from "express";
 
+// Create new equipment
 export const createEquipment = async (
   name: string,
   location: string,
@@ -19,6 +19,7 @@ export const createEquipment = async (
   }
 };
 
+// Get all equipment
 export const getEquipment = async () => {
   try {
     const [rows]: any = await pool.query("SELECT * FROM equipment");
@@ -30,6 +31,16 @@ export const getEquipment = async () => {
   }
 };
 
+// Get equipment by status
+export const getEquipmentByStatus = async (status: string) => {
+  const [rows]: any = await pool.query(
+    `SELECT * FROM equipment WHERE status = ?`,
+    [status]
+  );
+  return rows;
+};
+
+// Update equipment details
 export const updateEquipment = async (
   id: number,
   fields: { name?: string; location?: string; type?: string; status?: string }
@@ -68,6 +79,7 @@ export const updateEquipment = async (
   return result;
 };
 
+// Delete equipment using ID
 export const deleteEquipment = async (id: number) => {
   const [result]: any = await pool.query(
     `DELETE FROM equipment WHERE equipmentId = ?`,

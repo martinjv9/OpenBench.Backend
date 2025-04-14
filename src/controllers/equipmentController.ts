@@ -37,6 +37,31 @@ export const getEquipment = async (req: Request, res: Response) => {
   }
 };
 
+export const getEquipmentByStatusController = async (
+  req: Request,
+  res: Response
+) => {
+  const { filter } = req.query;
+
+  const allowedStatuses = ["available", "in_use", "faulty"];
+  if (
+    !filter ||
+    typeof filter !== "string" ||
+    !allowedStatuses.includes(filter)
+  ) {
+    res.status(400).json({ message: "Invalid or missing filter parameter" });
+    return;
+  }
+
+  try {
+    const equipment = await EquipmentModel.getEquipmentByStatus(filter);
+    res.status(200).json(equipment);
+  } catch (error) {
+    handleError(res, error, "Error fetching equipment by status");
+    return;
+  }
+};
+
 export const updateEquipment = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, location, type, status } = req.body;
