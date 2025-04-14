@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import logger from "../services/loggingService";
 import { createOneTimeCode } from "../models/OneTimeCodeModel";
 import { sendOTCEmail } from "../services/emailService";
+import { logActivity } from "../services/activityLogsService";
 
 dotenv.config();
 
@@ -44,6 +45,13 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         userId: user.id,
         ip: req.ip,
       });
+
+      await logActivity(
+        null,
+        "Failed Login Attempt",
+        `Failed login for email: ${email}`,
+        req.ip as string
+      );
       res.status(401).json({ message: "Invalid email or password." });
       return;
     }
@@ -56,6 +64,13 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       step: "verify-otc",
       userId: user.id,
     });
+
+    await logActivity(
+      user.id as number,
+      "Login Attempt",
+      "Successful login - OTP sent to email",
+      req.ip as string
+    );
   } catch (error) {
     if (error instanceof Error) {
       logger.error("Login error.", {

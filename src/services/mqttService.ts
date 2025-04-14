@@ -1,7 +1,7 @@
 import mqtt from "mqtt";
 import dotenv from "dotenv";
 import logger from "../services/loggingService";
-import { postSensorData } from "../controllers/sensorController";
+import { processSensorData } from "../controllers/sensorController";
 import { Request, Response } from "express";
 
 dotenv.config();
@@ -46,7 +46,7 @@ client.on("message", async (topic, message) => {
       },
     } as unknown as Response;
 
-    await postSensorData(mockReq, mockRes);
+    await processSensorData(mockReq, mockRes);
   } catch (error) {
     logger.error("Failed to handle MQTT message", {
       error: error instanceof Error ? error.message : error,
