@@ -353,9 +353,13 @@ Usage sessions start/end
 
 🛠️ Setup & Development
 1. Install dependencies
-   npm install
 
-2. Create .env file
+   ```
+   npm install
+   ```
+
+3. Create .env file
+   ```
    SMTP_HOST=<smtp>
    SMTP_PORT=587
    SMTP_USER=<user>
@@ -365,11 +369,14 @@ Usage sessions start/end
    PEPPER_SECRET=<pepper>
    JWT_ACCESS_SECRET=<secret>
    JWT_REFRESH_SECRET=<secret>
+   ```
 
-3. Run development server:
+5. Run development server:
+   ```
    npm run dev
+   ```
 
-4. Test API:
+7. Test API:
 
 - Use Postman
 - Flow: register -> verify email -> login -> verify-otc -> use JWT
