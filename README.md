@@ -147,9 +147,11 @@ Registers a new user.
 }
 ```
 Response 201 Created:
+```
 {
 "message": "User registered successfully. Please verify your email."
 }
+```
 Response 400 Bad Request:
 ```
 {
@@ -181,7 +183,9 @@ Response 401 Unauthorized:
 }
 ```
 
-POST /api/auth/verify-otc Verifies OTP and issues access token.
+POST /api/auth/verify-otc
+Verifies OTP and issues access token.
+
 Request Body:
 ```
 {
@@ -197,7 +201,9 @@ Response 200 OK:
 }
 ```
 
-GET /api/auth/verify-email?token=xxx Verifies email token.
+GET /api/auth/verify-email?token=xxx
+Verifies email token.
+
 Response 200 OK:
 ```
 {
@@ -212,19 +218,28 @@ Response 400 Bad Request:
 }
 ```
 
-POST /api/auth/refresh-access-token Refreshes JWT access token.
+POST /api/auth/refresh-access-token
+Refreshes JWT access token.
+
 Headers:
+```
 Cookie: refreshToken=<refresh_token>
+```
 Response 200 OK:
+
 ```
 {
 "accessToken": "NEW_JWT_ACCESS_TOKEN"
 }
 ```
 
-GET /api/equipment Fetch all equipment.
+GET /api/equipment
+Fetch all equipment.
+
 Headers:
+```
 Authorization: Bearer <accessToken>
+```
 Response 200 OK:
 ```
 [
@@ -240,7 +255,9 @@ Response 200 OK:
 ]
 ```
 
-POST /api/equipment Create equipment.
+POST /api/equipment
+Create equipment.
+
 Request Body:
 ```
 {
@@ -258,7 +275,9 @@ Response 201 Created:
 }
 ```
 
-PUT /api/equipment/:id Update equipment.
+PUT /api/equipment/:id
+Update equipment.
+
 Request Body:
 ```
 {
@@ -276,7 +295,9 @@ Response 200 OK:
 }
 ```
 
-DELETE /api/equipment/:id Delete equipment.
+DELETE /api/equipment/:id
+Delete equipment.
+
 Response 200 OK:
 ```
 {
@@ -284,7 +305,9 @@ Response 200 OK:
 }
 ```
 
-POST /api/sensors/data Simulate sensor activity.
+POST /api/sensors/data
+Simulate sensor activity.
+
 Request Body:
 ```
 {
