@@ -59,6 +59,7 @@ export const findOneTimeCodebyUserId = async (
       LIMIT 1
     `;
     const [rows]: any = await pool.execute(sql, [userId]);
+    console.log("Rows:", rows); // Debugging line to check retrieved rows
 
     if (!rows || rows.length === 0) {
       return null;
