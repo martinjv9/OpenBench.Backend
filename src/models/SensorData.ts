@@ -5,7 +5,7 @@ import { formatTimestampForMySQL } from "../utils/dateUtils";
 export interface SensorData {
   id?: number;
   sensorId: number;
-  equipmentId: string;
+  equipmentId: number;
   timestamp: string;
   activity: boolean;
 }
@@ -13,7 +13,10 @@ export interface SensorData {
 export const storeData = async (data: SensorData): Promise<void> => {
   try {
     const { equipmentId, sensorId, activity, timestamp } = data;
-    const formattedTimestamp = formatTimestampForMySQL(timestamp);
+    logger.debug("Formatting timestamp", { rawTimestamp: timestamp });
+    const formattedTimestamp = timestamp
+      ? formatTimestampForMySQL(timestamp)
+      : new Date().toISOString().slice(0, 19).replace("T", " ");
 
     // ✅ Input validation
     if (
@@ -55,12 +58,12 @@ export const storeData = async (data: SensorData): Promise<void> => {
 
     throw new Error(
       "Database insert failed: " +
-        (error instanceof Error ? error.message : String(error))
+      (error instanceof Error ? error.message : String(error))
     );
   }
 };
 
-export const startUsageSession = async (equipmentId: string): Promise<void> => {
+export const startUsageSession = async (equipmentId: number): Promise<void> => {
   if (!(await checkEquipmentExists(equipmentId))) {
     logger.error(
       `Cannot start session: Equipment ID ${equipmentId} does not exist.`
@@ -92,7 +95,7 @@ export const startUsageSession = async (equipmentId: string): Promise<void> => {
   }
 };
 
-export const endUsageSession = async (equipmentId: string): Promise<void> => {
+export const endUsageSession = async (equipmentId: number): Promise<void> => {
   const [openSession]: any = await pool.query(
     `SELECT usageId, startTime FROM equipment_usage WHERE equipmentId = ? AND endTime IS NULL`,
     [equipmentId]
@@ -122,7 +125,7 @@ export const endUsageSession = async (equipmentId: string): Promise<void> => {
   }
 };
 
-const checkEquipmentExists = async (equipmentId: string): Promise<boolean> => {
+const checkEquipmentExists = async (equipmentId: number): Promise<boolean> => {
   const [equipmentCheck]: any = await pool.query(
     `SELECT * FROM equipment WHERE equipmentId = ?`,
     [equipmentId]

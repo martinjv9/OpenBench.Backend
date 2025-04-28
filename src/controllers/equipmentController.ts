@@ -3,6 +3,7 @@ import logger from "../services/loggingService";
 import * as EquipmentModel from "../models/EquipmentModel";
 import { handleError } from "../services/errorHandler";
 import { logActivity } from "../services/activityLogsService";
+import pool from "../config/db";
 
 // Create new equipment
 export const createEquipment = async (req: Request, res: Response) => {
@@ -162,6 +163,7 @@ export const getEquipmentActive = async (req: Request, res: Response) => {
 
 }
 
+// Refactor to use EquipmentModel instead, not interacting with the database directly
 export const getEquipmentMap = async (req: Request, res: Response) => {
     try {
         const [results]: any = await pool.query(`

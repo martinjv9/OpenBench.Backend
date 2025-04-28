@@ -11,6 +11,8 @@ import dashboardRoutes from "./routes/dashboardRoutes";
 import equipmentRoutes from "./routes/equipmentRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import cookieParser from "cookie-parser";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 dotenv.config();
 

@@ -82,7 +82,11 @@ export const findUserByUsername = async (
 
 export const findUserById = async (id: number): Promise<User | null> => {
   try {
-    const query = "SELECT * FROM users WHERE id = ?";
+    const query = `
+      SELECT id, username, first_name, last_name, email, password,
+             security_question_1, answer_1, security_question_2, answer_2, role
+      FROM users
+      WHERE id = ?`;
     const params = [id];
     const [rows]: any = await pool.query(query, params);
 

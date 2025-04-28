@@ -45,7 +45,6 @@ export const verifyOTC = async (req: Request, res: Response): Promise<void> => {
     await deleteOneTimeCode(userId);
 
     const accessToken = generateAccessToken(userId, user.email, user.role);
-
     // ✅ Generate Refresh Token
     const refreshToken = generateRefreshToken(userId, user.email, user.role);
 
@@ -65,9 +64,11 @@ export const verifyOTC = async (req: Request, res: Response): Promise<void> => {
     });
 
     logger.info("✅ One-time code verified successfully", { userId });
-    res
-      .status(200)
-      .json({ message: "One-time code verified successfully", accessToken });
+    res.status(200).json({
+      message: "One-time code verified successfully",
+      accessToken,
+      role: user.role
+    });
   } catch (error) {
     logger.error("❌ Error in verifyOTC:", {
       userId,
