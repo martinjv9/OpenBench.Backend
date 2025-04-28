@@ -11,7 +11,6 @@ const router = express.Router();
 
 // Protect all routes: Admin only
 router.use(authenticateToken, authorizeRoles("admin"));
-
 router.get("/users", getAllUsers);
 router.put("/users/:id/role", updateUserRole);
 router.put("/users/:id/disable", disableUserAccount);

@@ -21,7 +21,7 @@ export const sendEmailVerification = async (
   to: string,
   token: string
 ): Promise<void> => {
-  const verificationLink = `${process.env.APP_URL}/verify-email?token=${token}`;
+  const verificationLink = `${process.env.APP_URL}/api/auth/verify-email?token=${token}`;
   const html = compileTemplate("verificationEmail", { verificationLink });
 
   try {

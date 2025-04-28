@@ -9,11 +9,13 @@ import { verifyEmail } from "../controllers/verifyEmailController";
 import { resendOTC } from "../controllers/resendOTCController";
 import { logoutUser } from "../controllers/logoutController";
 import { verifyOTC } from "../controllers/veriftyOTCController";
+import { resendVerificationToken } from "../models/VerificationTokenModel";
 
 const router = express.Router();
 
 router.post("/register", registerUser);
 router.get("/verify-email", verifyEmail);
+router.post("/resend-verify-email", resendVerificationToken)
 router.post("/login", loginUser);
 router.post("/verify-otc", verifyOTC);
 router.post("/refresh", refreshToken);

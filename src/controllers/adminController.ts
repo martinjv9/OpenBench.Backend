@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import pool from "../config/db";
 import { logActivity } from "../services/activityLogsService";
 
+// Function to get all users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const [users] = await pool.query(
@@ -14,6 +15,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
+// Function to get a single user by ID and updates their role
 export const updateUserRole = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -33,6 +35,7 @@ export const updateUserRole = async (req: Request, res: Response) => {
   }
 };
 
+// Function to disable or enable a user account
 export const disableUserAccount = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { disabled } = req.body;

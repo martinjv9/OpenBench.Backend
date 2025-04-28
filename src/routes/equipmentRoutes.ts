@@ -6,6 +6,7 @@ import {
   deleteEquipment,
   getEquipmentByStatusController,
   getEquipmentUsageSummaryController,
+  getEquipmentMap
 } from "../controllers/equipmentController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorizeRoles } from "../middlewares/roleMiddleware";
@@ -55,4 +56,5 @@ router.delete(
   deleteEquipment
 );
 
+router.get("/map", getEquipmentMap);
 export default router;

@@ -12,6 +12,7 @@ export const verifyEmail = async (
 ): Promise<void> => {
   try {
     const { token } = req.query;
+    logger.info("🔑 Verifying token:", { token });
     if (!token || typeof token !== "string") {
       res.status(400).json({ message: "Invalid verification token" });
       return;
@@ -45,11 +46,11 @@ export const verifyEmail = async (
     // Delete the verification token after successful verification
     await deleteVerificationToken(token);
     logger.info("✅ Email verified successfully", { userId });
-    res.status(200).json({ message: "Email verified successfully!" });
+    res.redirect(`${process.env.FRONTEND_URL}/verify?status=success`);
   } catch (error) {
     logger.error("❌ Error in verifyEmail:", {
       error: error instanceof Error ? error.message : String(error),
     });
-    res.status(500).json({ message: "Internal server error" });
+    res.redirect(`${process.env.FRONTEND_URL}/verify?status=error`);
   }
 };

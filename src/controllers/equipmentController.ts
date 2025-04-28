@@ -3,6 +3,7 @@ import logger from "../services/loggingService";
 import * as EquipmentModel from "../models/EquipmentModel";
 import { handleError } from "../services/errorHandler";
 import { logActivity } from "../services/activityLogsService";
+import pool from "../config/db";
 
 // Create new equipment
 export const createEquipment = async (req: Request, res: Response) => {
@@ -145,3 +146,55 @@ export const deleteEquipment = async (req: Request, res: Response) => {
     return;
   }
 };
+
+
+export const getEquipmentActive = async (req: Request, res: Response) => {
+    try {
+        const active: any = await pool.query("SELECT COUNT(*) AS count FROM equipmenttest WHERE in_use ='1'");
+
+        res.json({
+            active: active[0]?.count || 0
+        })
+    } catch (err) {
+        console.error("Error fetching equipment summary:", err);
+        res.status(500).json({ error: "Internal server error, TACTO1" });
+
+    }
+
+}
+
+// Refactor to use EquipmentModel instead, not interacting with the database directly
+export const getEquipmentMap = async (req: Request, res: Response) => {
+    try {
+        const [results]: any = await pool.query(`
+        SELECT equipment_id, equipment_name, in_use, sensor_id, battery, datetime AS last_updated
+        FROM equipmenttest
+      `);
+
+        res.json(results);
+    } catch (error) {
+        console.error("Error fetching equipment map:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const getEquipmentMapData = async (req: Request, res: Response) => {
+    try {
+        const [rows]: any = await pool.query(`
+        SELECT 
+          equipment_id,
+          equipment_name,
+          in_use,
+          sensor_id,
+          battery,
+          updated_at AS last_updated
+        FROM equipmenttest
+      `);
+
+        res.json(rows);
+    } catch (err) {
+        console.error("Error fetching equipment map data:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
