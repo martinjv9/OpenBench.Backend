@@ -5,7 +5,7 @@ export const logoutUser = (req: Request, res: Response): void => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
   });
   logger.info("✅ User logged out successfully");
 
