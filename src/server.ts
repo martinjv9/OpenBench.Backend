@@ -89,11 +89,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start Server
-// app.listen(PORT, "0.0.0.0", () => {
-//   console.log(`🌍 Server running on http://localhost:${PORT}`);
-// });
-
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`🌍 Server + Socket.io running on http://localhost:${PORT}`);
 });
