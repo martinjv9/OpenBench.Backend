@@ -15,7 +15,6 @@ const PEPPER_SECRET = process.env.PEPPER_SECRET || "";
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, pwd } = req.body;
-    console.log(email, pwd); // Debugging line to check input values
 
     if (!email || !pwd) {
       logger.warn("Login failed due to missing credentials.", {
