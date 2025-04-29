@@ -147,40 +147,39 @@ export const deleteEquipment = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getEquipmentActive = async (req: Request, res: Response) => {
-    try {
-        const active: any = await pool.query("SELECT COUNT(*) AS count FROM equipmenttest WHERE in_use ='1'");
+  try {
+    const active: any = await pool.query(
+      "SELECT COUNT(*) AS count FROM equipmenttest WHERE in_use ='1'"
+    );
 
-        res.json({
-            active: active[0]?.count || 0
-        })
-    } catch (err) {
-        console.error("Error fetching equipment summary:", err);
-        res.status(500).json({ error: "Internal server error, TACTO1" });
-
-    }
-
-}
+    res.json({
+      active: active[0]?.count || 0,
+    });
+  } catch (err) {
+    console.error("Error fetching equipment summary:", err);
+    res.status(500).json({ error: "Internal server error, TACTO1" });
+  }
+};
 
 // Refactor to use EquipmentModel instead, not interacting with the database directly
 export const getEquipmentMap = async (req: Request, res: Response) => {
-    try {
-        const [results]: any = await pool.query(`
-        SELECT equipment_id, equipment_name, in_use, sensor_id, battery, datetime AS last_updated
-        FROM equipmenttest
+  try {
+    const [results]: any = await pool.query(`
+        SELECT equipmentId AS equipment_id, name AS equipment_name, status AS in_use, updatedAt AS last_updated
+        FROM equipment
       `);
 
-        res.json(results);
-    } catch (error) {
-        console.error("Error fetching equipment map:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+    res.json(results);
+  } catch (error) {
+    console.error("Error fetching equipment map:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const getEquipmentMapData = async (req: Request, res: Response) => {
-    try {
-        const [rows]: any = await pool.query(`
+  try {
+    const [rows]: any = await pool.query(`
         SELECT 
           equipment_id,
           equipment_name,
@@ -191,10 +190,9 @@ export const getEquipmentMapData = async (req: Request, res: Response) => {
         FROM equipmenttest
       `);
 
-        res.json(rows);
-    } catch (err) {
-        console.error("Error fetching equipment map data:", err);
-        res.status(500).json({ error: "Internal server error" });
-    }
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching equipment map data:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
-

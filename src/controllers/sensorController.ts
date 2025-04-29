@@ -4,6 +4,7 @@ import pool from "../config/db";
 import { logActivity } from "../services/activityLogsService";
 import logger from "../services/loggingService";
 import { formatTimestampForMySQL } from "../utils/dateUtils";
+import { io } from "../server";
 
 export const processSensorData = async (req: Request, res: Response) => {
   let { sensorId, equipmentId, timestamp, activity } = req.body;
@@ -26,7 +27,6 @@ export const processSensorData = async (req: Request, res: Response) => {
       [equipmentId]
     );
     // logger.info("✅ Step 2 complete: Fetched equipment status");
-
 
     if (equipmentRows.length === 0) {
       res.status(404).json({ message: "Equipment not found" });
@@ -74,7 +74,7 @@ export const processSensorData = async (req: Request, res: Response) => {
         const durationSec = Math.floor(
           (new Date(formattedTimestamp).getTime() -
             new Date(startTime).getTime()) /
-          1000
+            1000
         );
         // logger.info("✅ Step 8: Calculated duration");
 
@@ -100,6 +100,12 @@ export const processSensorData = async (req: Request, res: Response) => {
       // logger.info("✅ Step 11: Logged activity");
     }
 
+    io.emit("statusUpdate", {
+      equipmentId,
+      inUse: activity,
+      timestamp: new Date().toISOString(),
+    });
+
     res.status(201).json({ message: "Sensor data processed successfully" });
   } catch (error: any) {
     logger.error("Error processing sensor data", {
@@ -109,5 +115,4 @@ export const processSensorData = async (req: Request, res: Response) => {
     });
     res.status(500).json({ message: "Internal server error" });
   }
-
 };
