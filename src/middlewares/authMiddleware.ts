@@ -6,6 +6,7 @@ import { JWT_SECRET } from "../config/jwtConfig";
 interface DecodedUser extends JwtPayload {
   userId: number;
   email?: string;
+  role?: string;
 }
 
 // ✅ Extend Express Request Type to Support `req.user`

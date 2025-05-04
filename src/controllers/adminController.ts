@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import pool from "../config/db";
 import { logActivity } from "../services/activityLogsService";
+import { getActivityLogs } from "../models/LoggingModel";
+import { handleError } from "../services/errorHandler";
 
 // Function to get all users
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -51,5 +53,16 @@ export const disableUserAccount = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error updating user account:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// GET /api/admin/logs
+export const getAdminActivityLogs = async (req: Request, res: Response) => {
+  try {
+    const limit = Number(req.query.limit) || 100;
+    const logs = await getActivityLogs(limit);
+    res.status(200).json(logs);
+  } catch (error) {
+    handleError(res, error, "Failed to retrieve logs");
   }
 };

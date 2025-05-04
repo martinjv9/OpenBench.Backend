@@ -1,5 +1,5 @@
 import express from "express";
-import { processSensorData } from "../controllers/sensorController";
+import { getSensorInfoController, processSensorData } from "../controllers/sensorController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorizeRoles } from "../middlewares/roleMiddleware";
 import pool from "../config/db";
@@ -25,5 +25,7 @@ router.get(
     }
   }
 );
+
+router.get("/info", authenticateToken, authorizeRoles("technician", "admin"), getSensorInfoController);
 
 export default router;

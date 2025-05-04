@@ -196,3 +196,27 @@ export const getEquipmentMapData = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getEquipmentStatsController = async (req: Request, res: Response) => {
+  try {
+    const stats = await EquipmentModel.getEquipmentStats();
+    res.status(200).json(stats);
+  } catch (error) {
+    handleError(res, error, "Error fetching equipment stats");
+  }
+};
+
+export const getEquipmentInfoController = async (req: Request, res: Response) => {
+  try {
+    const info = await EquipmentModel.getEquipment(); // Reuses getEquipment()
+    const formatted = info.map((e: any) => ({
+      equipmentId: e.equipmentId,
+      name: e.name,
+      type: e.type,
+      location: e.location
+    }));
+    res.status(200).json(formatted);
+  } catch (error) {
+    handleError(res, error, "Error fetching equipment info");
+  }
+};

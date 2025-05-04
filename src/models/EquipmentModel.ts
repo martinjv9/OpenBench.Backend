@@ -109,3 +109,17 @@ export const deleteEquipment = async (id: number) => {
   );
   return result;
 };
+
+export const getEquipmentStats = async () => {
+  const [rows]: any = await pool.query(`
+    SELECT 
+      e.equipmentId,
+      e.name,
+      e.usageCount,
+      COALESCE(SUM(u.durationSec), 0) AS usageDuration
+    FROM equipment e
+    LEFT JOIN equipment_usage u ON e.equipmentId = u.equipmentId
+    GROUP BY e.equipmentId, e.name, e.usageCount
+  `);
+  return rows;
+};

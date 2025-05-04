@@ -5,6 +5,8 @@ import { logActivity } from "../services/activityLogsService";
 import logger from "../services/loggingService";
 import { formatTimestampForMySQL } from "../utils/dateUtils";
 import { io } from "../server";
+import { getSensorInfo } from "../models/SensorModel";
+import { handleError } from "../services/errorHandler";
 
 export const processSensorData = async (req: Request, res: Response) => {
   let { sensorId, equipmentId, timestamp, activity } = req.body;
@@ -114,5 +116,14 @@ export const processSensorData = async (req: Request, res: Response) => {
       error,
     });
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getSensorInfoController = async (req: Request, res: Response) => {
+  try {
+    const info = await getSensorInfo();
+    res.status(200).json(info);
+  } catch (error) {
+    handleError(res, error, "Error fetching sensor info");
   }
 };
